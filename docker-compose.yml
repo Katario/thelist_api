@@ -12,10 +12,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mongo_container
+      - thelist_mongo_container
   
   thelist_mongo_container:
     container_name: thelist_mongo_container
+    restart: always
     image: mongo:latest
     environment:
       MONGO_ROOT_USERNAME: ${MONGO_USERNAME}
