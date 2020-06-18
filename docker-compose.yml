@@ -1,0 +1,29 @@
+version: "3.3"
+services:
+  thelist_api_container:
+    container_name: thelist_api_container
+    restart: always
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/app'
+      - '/usr/src/app/src/node_modules'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo_container
+  
+  thelist_mongo_container:
+    container_name: thelist_mongo_container
+    image: mongo:latest
+    environment:
+      MONGO_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data_container:/data/db
+    ports:
+      - 27017:27017
+
+volumes:
+  mongodb_data_container:
