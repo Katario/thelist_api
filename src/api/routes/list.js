@@ -1,23 +1,63 @@
 import { Router } from 'express';
 import List from '../../models/list';
-const route = Router();
+const router = Router();
 
 export default (routesApp) => {
-  routesApp.use('/list', route)
+  routesApp.use('/list', router)
   // get all
-  route.get('/', async (req, res) => {
+  router.get('/', async (req, res) => {
     let lists = await List.find();
+
     return res.json({ lists }).status(200);
   });
 
   // get one
-  // route.get('/INSERT_ID', (req, res) => {
-  //   return res.json({ lists }).status(200);
-  // });
+  router.get('/:id', async (req, res) => {
+    const list = await List.findOne({ _id: req.params.id});
+
+    return res.json({ list }).status(200);
+  });
   
-  // route.post('/', (req, res) => {
-  // });
+  // post one
+  router.post('/', async (req, res) => {
+    let list = new List({
+      title: req.body.title,
+      author: req.body.author,
+      type: req.body.type,
+      // list.template
+      create: Date.now,
+      update: Date.now,
+    });
+
+    await list.save();
+
+    return res.json({ list }).status(200);
+  });
+
+  // update one
+  router.patch('/:id', async (req, res) => {
+    try {
+      const list = await List.findOne({ _id: req.params.id });
+      if (req.body.title) list.title = req.body.title;
+      if (req.body.author) list.author = req.body.author;
+      if (req.body.type) list.type = req.body.type;
+      list.update = Date.now;
+      await list.save();
+
+      return res.json({ list }).status(200);
+    } catch {
+      return res.json({ error: 'List doesn\' exist!' }).status(404);
+    }
+  });
   
-  // route.delete('/', (req, res) => {
-  // });
+  // delete one
+  router.delete('/:id', async (req, res) => {
+    try {
+      await List.deleteOne({ _id: req.params.id });
+
+      return res.json({ message : 'Deleted successfully!'}).status(204);
+    } catch {
+      return res.json({ error: 'List doesn\' exist!' }).status(404);
+    }
+  });
 };

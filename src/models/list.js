@@ -7,6 +7,7 @@ const List = new mongoose.Schema({
     index: true,
   },
   author: String,
+  type: String,
   template: [{
     blankTemplate: {
       content: Object
