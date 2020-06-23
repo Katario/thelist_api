@@ -6,7 +6,12 @@ export default (routesApp) => {
   routesApp.use('/list', router)
   // get all
   router.get('/', async (req, res) => {
-    let lists = await List.find();
+    let lists = await List.find({}, (err, result) => {
+      if (err) {
+        console.log(err);
+      };
+    })
+    .sort({ updated: 'desc' });
 
     return res.json({ lists }).status(200);
   });
@@ -25,8 +30,8 @@ export default (routesApp) => {
       author: req.body.author,
       type: req.body.type,
       // list.template
-      create: Date.now,
-      update: Date.now,
+      created: Date.now(),
+      updated: Date.now(),
     });
 
     await list.save();
@@ -41,7 +46,7 @@ export default (routesApp) => {
       if (req.body.title) list.title = req.body.title;
       if (req.body.author) list.author = req.body.author;
       if (req.body.type) list.type = req.body.type;
-      list.update = Date.now;
+      list.updated = Date.now();
       await list.save();
 
       return res.json({ list }).status(200);
